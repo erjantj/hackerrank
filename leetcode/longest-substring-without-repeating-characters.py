@@ -1,40 +1,27 @@
 def lengthOfLongestSubstring(s):
-    dp = [[1, [s[i]]] for i in range(len(s))]
-
-    if not s:
+    if  not s:
         return 0
-    if len(s)==1:
-        return 1
-
+    
     maxx = 0
-    for i in range(1, len(s)):
-        prevCount, prevSet = dp[i-1]
-        tmpCount = prevCount+1
-        tmpSet = prevSet
+    tmp_max = 0
+    start = 0
+    letter_last_index = {}
 
-        if s[i] not in prevSet:
-            tmpSet.append(s[i])
-        else:
-            tmpSet = []
-            tmpCount = dp[i][0]
-            duplicateFound = False
-            for j in range(len(prevSet)):
-                if prevSet[j] == s[i]:
-                    duplicateFound = True
-                    continue
-                if duplicateFound:
-                    tmpSet.append(prevSet[j])
-                    tmpCount += 1
-            tmpSet.append(s[i])
+    for i in range(len(s)):
+        start = max(start, letter_last_index.get(s[i], 0))
+        if s[start] == s[i] and i != start:
+            start += 1
 
-        if tmpCount > maxx:
-            maxx = tmpCount
-            
-        dp[i][0] = tmpCount
-        dp[i][1] = tmpSet
+        tmp_max = i - start + 1
 
+        if tmp_max > maxx:
+            maxx = tmp_max
+
+        letter_last_index[s[i]] = i
     return maxx
 
-s = "abrcbklgabr"
+s = "aaba"
+# s = "tmmzuxt"
+# s = "wobgvwrovw"
 
 print(lengthOfLongestSubstring(s))
