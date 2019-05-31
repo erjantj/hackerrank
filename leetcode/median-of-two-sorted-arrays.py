@@ -1,87 +1,55 @@
 import sys
 
-def helper(nums1, start1, nums2, start2, k):
-    print()
-    print(nums1[start1:], nums2[start2:], k)
-
-    if start1 > len(nums1) - 1:
-        return nums2[start2 + k - 1]
-
-    if start2 > len(nums2) - 1: 
-        return nums1[start1 + k - 1]
-
+def findPositionVal(nums1, nums2, i1, len1, i2, len2, k):
+    print(nums1[i1:i1+len1], nums2[i2:i2+len2], k)
+    if len1 == 0 and len2 > 0:
+        return nums2[i2+k-1]
+    if len2 == 0 and len1 > 0:
+        return nums1[i1+k-1]
     if k == 1:
-        return min(nums1[start1], nums2[start2])
-    
-    mid1 = sys.maxsize
-    mid2 = sys.maxsize
+        return min(nums1[i1],nums2[i2])
 
-    if start1 + k//2 - 1 < len(nums1):
-        mid1 = nums1[start1 + k//2 - 1] 
-        print(nums1[start1:], start1 + k//2 - 1, nums1[start1 + k//2 - 1])
+    mid1 = min(len1, k//2)
+    mid2 = min(len2, k//2)
 
-    if start2 + k//2 - 1 < len(nums2):
-        mid2 = nums2[start2 + k//2 - 1]        
-        print(nums2[start2:], start2 + k//2 - 1, nums2[start2 + k//2 - 1])
-    
-    print('mid1=', mid1)
-    print('mid2=', mid2)
-
-    if mid1 < mid2:
-        # Check: nums1Right + nums2Left 
-        return helper(nums1, start1 + k//2, nums2, start2, k - k//2) 
+    print(mid1, mid2)
+    if nums1[i1+mid1-1] < nums2[i2+mid2-1]:
+        return findPositionVal(nums1, nums2, i1+mid1, len1-mid1, i2, len2, k-mid1)
     else:
-        # Check: nums2Right + nums1Left
-        return helper(nums1, start1, nums2, start2 + k//2, k - k//2) 
+        return findPositionVal(nums1, nums2, i1, len1, i2+mid2, len2-mid2, k-mid2)
 
-    
 def findMedianSortedArrays(nums1, nums2):
-    m = len(nums1)
-    n = len(nums2)
+    if not nums1 and not nums2:
+        return 0
 
-    l = (m + n + 1) // 2
-    r = (m + n + 2) // 2
+    n = len(nums1)
+    m = len(nums2)
 
-    return (helper(nums1, 0, nums2, 0, l) + helper(nums1, 0, nums2, 0, r)) / 2
+    i1 = (n+m-1)//2+1
+    i2 = (n+m)//2+1
 
-# nums1 = [1, 2]
-# nums2 = [3, 4, 5, 6]
-
-nums1 = [1,2,4,5]
-nums2 = [6]
-
-# nums1 = [3,5,6]
-# nums2 = [2,4,7,8,9]
-
-# nums1 = [2,3,4]
-# nums2 = [5,6,7,8,9]
+    return (findPositionVal(nums1, nums2, 0, len(nums1), 0, len(nums2), i1) +
+        findPositionVal(nums1, nums2, 0, len(nums1), 0, len(nums2), i2))//2
 
 
-print(findMedianSortedArrays(nums1, nums2))
-
-# 2,3,4,5,6,7,8,9
-#       ^ ^
-# k = 4/2 = 2
-# 1)      
-# 3,5,6
-# 2,4,7,8,9
-
-# 2,3,4,5,6,7,8,9
-#       ^   ^
-
-# 2)
-# 5,6
-# 2,4,7
-
-# 2,4,5,6,7
-#   ^ ^
+# [3,4,5]
+# [6,7,8,9,10]
 
 
-# 3)
-# 5
-# 4,7
+# k = 2
 
-# 4,5,7
-#   ^ 
+# # ka = k//2 = 1
+# # kb = k//2 = 1
+
+
+
+# nums1 = [1,2,3,4,5]
+# nums2 = [6,7,8,9,10]
+
+nums1 = [1,2]
+nums2 = [3,4]
+print(findPositionVal(nums1, nums2, 0, len(nums1), 0, len(nums2), 4))
+# print(findMedianSortedArrays(nums1, nums2))
+
 
 

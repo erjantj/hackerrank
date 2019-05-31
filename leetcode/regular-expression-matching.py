@@ -1,67 +1,50 @@
+def helper(s, p, dp, i, j):
+    if i < -1 or j < -1:
+        return False
+
+    key = ('%d:%d')%(i,j)
+    if key in dp:
+        return dp[key]
+
+    result = False
+    if j-1>=0 and p[j] == '*':
+        result = helper(s,p,dp,i,j-2) or helper(s,p,dp,i,j-1)
+        if p[j-1] == '.':
+            result = result or helper(s,p,dp,i-1,j)
+        elif i >=0:
+            result = result or (helper(s,p,dp,i-1,j) and p[j-1] == s[i])
+    elif j>=0 and i >=0 and (p[j] == '.' or s[i] == p[j]):
+        result = helper(s,p,dp,i-1,j-1)
+
+    dp[key] = result
+    return result
+
+    
 def isMatch(s, p):
-    pr = ''
-    sp = ''
-    i = 0
-    j = 0
-    star = '*'
-    dot = '.'
-    ss = list(s)
-    pp = list(p)
+    dp = {}
+    dp['-1:-1'] = True
 
-    while i < len(pp) or j < len(ss):
-        if i >= len(pp) and j >= len(ss):
-            return True
-        else:
-            if i >= len(pp):
-                print('asd')
-                if sp == star:
-                    return True
-                if not sp == star:
-                    return False
-            if j >= len(ss):
-                if sp == star:
-                    return True
-                if not sp == star:
-                    return False
-                
+    result = helper(s,p,dp,len(s)-1,len(p)-1)
+    return result
 
-        print('pi=',pp[i])
-        print('sj=',ss[j])
-        print('pr=',pr)
-        print('sp=',sp)
-        print()
-        
 
-        if sp == star:
-            if pr == ss[j]:
-                j += 1
-            else:
-                i += 1
-                sp = ''
-                pr = ''
-        else:
-            if pp[i] == star:
-                sp = star
-                pr = p[i-1]
-            elif pp[i] == dot:
-                pp[i] = ss[j]
-                i += 1
-                j += 1
-            elif pp[i] != ss[j]:
-                if i+1 < len(pp) and pp[i+1] == star:
-                    i += 2
-                else:
-                    return False
-            else:
-                i += 1
-                j += 1
+# s = "aa"
+# p = "a"
 
-    return True
+# s = "aa"
+# p = "a*"
 
-# s='mississippi'
-# p='mis*is*p*.'
+# s = "aab"
+# p = "c*a*b"
 
-s='ab'
-p='.*'
+# s = "a"
+# p = "c*a*"
+
+# s = "mississippi"
+# p = "mis*is*p*."
+
+# s = "c"
+# p = "c*a*"
+
 
 print(isMatch(s,p))

@@ -1,54 +1,92 @@
-class LRUCache:
+class Node:
+    def __init__(self, value):
+        self.value = value
+        self.next = None
+        self.prev = None
 
+class LRUCache:
     def __init__(self, capacity):
-        """
-        :type capacity: int
-        """
         self.capacity = capacity
-        self.lru = {}
-        self.key_index = []
+        self.cache = {}
+        self.head = None
+        self.tail = None
+
+    def print(self, head = None):
+        if not head:
+            head = self.head
+        if head.next:
+            self.print(head.next)
+
 
     def get(self, key):
-        """
-        :type key: int
-        :rtype: int
-        """
-        if key in self.lru:
-            index = self.key_index.index(key)
-            value = self.lru[key]
+        if key in self.cache:
+            node = self.cache[key]
+            if node == self.head and len(self.cache) > 1:
+                self.head = node.next
 
-            self.key_index.pop(index)
-            self.key_index.append(key)
+            if node != self.tail:
+                pre = node.prev
+                nex = node.next
 
-            return value
+                node.next = None
+                node.prev = self.tail
+                self.tail.next = node
+                self.tail = node
+                
+                if pre:
+                    pre.next = nex
+                if nex:
+                    nex.prev = pre
+
+
+            return node.value
+
         return -1
-        
+
+    def reduce(self):
+        if len(self.cache) > self.capacity:
+            new_head = self.head.next
+            key = self.head.key
+
+            new_head.prev = None
+            self.head.next = None
+            self.head = new_head
+
+            del self.cache[key]
 
     def put(self, key, value):
-        """
-        :type key: int
-        :type value: int
-        :rtype: void
-        """        
-        if key not in self.lru:
-            if len(self.key_index) >= self.capacity:
-                old_key = self.key_index.pop(0)
-                print(old_key)
-                del self.lru[old_key]
+        node = Node(key, value)
+
+        if not self.head:
+            self.head = node
+            self.tail = node
         else:
-            self.get(key)
-        
-        if key not in self.lru:
-            self.key_index.append(key)
-        self.lru[key] = value
+            if not key in self.cache:
+                node.prev = self.tail
+                self.tail.next = node
+                self.tail = node
+            else:
+                node = self.cache[key]
+                node.value = value
+                self.get(key)
+
+        self.cache[key] = node
+        self.reduce()
 
 # Your LRUCache object will be instantiated and called as such:
-cache = LRUCache(2)
-cache.put(2, 1)
-cache.put(1, 1)
-cache.put(2, 3)
-cache.put(4, 1)
+cache = LRUCache(1)
+
+cache.put(1,1)
+cache.put(2,2)
+cache.put(3,3)
+cache.put(4,4)
+
 print(cache.get(1))
+print(cache.get(4))
+print(cache.get(3))
 print(cache.get(2))
-
-
+cache.put(5,5)
+print(cache.get(5))
+# print(cache.get(3))
+# cache.put(6,6)
+# print(cache.get(2))
